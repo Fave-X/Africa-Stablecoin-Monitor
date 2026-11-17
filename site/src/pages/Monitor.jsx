@@ -4,11 +4,11 @@ import HeroField from '../components/HeroField'
 import { CountUp, Panel, Reveal, SectionNav, Segmented, SeriesChips } from '../components/ui'
 import { SITE } from '../site.config'
 import {
-  BAND_COLORS, RAILS, bandShares, bizShare, dailyVolume, fmtDay, fmtPct, fmtUsd, latestFee, tronZeroBurn, weeklyFees,
+  BAND_COLORS, RAILS, bandShares, bizShare, dailyVolume, fmtDay, fmtPct, fmtUsd, latestFee, tronZeroBurn, walletStats, weeklyFees,
 } from '../data'
 
 const SECTIONS = [
-  { id: 'cost', label: 'Cost' }, { id: 'size', label: 'Transfer size' }, { id: 'mix', label: 'USDT vs USDC' },
+  { id: 'cost', label: 'Cost' }, { id: 'size', label: 'Transfer size' }, { id: 'wallets', label: 'Real users' }, { id: 'mix', label: 'USDT vs USDC' },
   { id: 'peg', label: 'Peg' }, { id: 'concentration', label: 'Concentration' }, { id: 'limits', label: 'Limits' },
 ]
 const BAND_LABEL = { '<1k': 'Under $1k', '1k-10k': '$1k–10k', '10k-100k': '$10k–100k', '100k+': '$100k+' }
@@ -70,6 +70,20 @@ export default function Monitor({ data }) {
     })),
   }
   const ethBizDelta = pctPts(bizShare(shares[0].base), bizShare(shares[0].post))
+
+  // ── Real users (ordinary wallets)
+  const ws = useMemo(() => ['USDT', 'USDC'].map((t) => walletStats(data, t)), [data])
+  const wUsdt = ws[0]
+  const perDayN = (w, k) => (w[k].days ? w[k].n / w[k].days : null)
+  const walTxChange = wUsdt ? perDayN(wUsdt.wal, 'post') / perDayN(wUsdt.wal, 'base') - 1 : null
+  const pctChg = (v) => (v == null ? '—' : `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v * 100).toFixed(0)}%`)
+  const walletChart = wUsdt && {
+    labels: ws.map((w) => `Ethereum · ${w.token}`),
+    datasets: [
+      { label: 'All transfers', data: ws.map((w) => w.allChange * 100), backgroundColor: '#5b6168' },
+      { label: 'Ordinary wallets', data: ws.map((w) => w.walChange * 100), backgroundColor: '#f2f2f2' },
+    ].map((d) => ({ ...d, borderColor: '#131313', borderWidth: 2, borderSkipped: false, borderRadius: 4, barThickness: 20 })),
+  }
 
   // ── Mix
   const vUsdt = dailyVolume(data, 'ethereum', 'USDT')
@@ -205,7 +219,37 @@ export default function Monitor({ data }) {
         </Panel>
       </Chapter>
 
-      <Chapter id="mix" n="03" kicker="Which dollar"
+      {wUsdt && (
+      <Chapter id="wallets" n="03" kicker="Real users"
+        headline={<>Take out exchanges, bots and contracts, and Ethereum USDT volume fell {pctChg(-wUsdt.walChange).replace('+', '')} after 5 Nov, not {pctChg(-wUsdt.allChange).replace('+', '')}.</>}
+        body={<>Ordinary wallets are addresses that aren't smart contracts and made fewer than 1,000 USDT/USDC transfers in the window. Since 5 Nov they account for {fmtPct(wUsdt.txShare, 0)} of Ethereum USDT transfers but only {fmtPct(wUsdt.volShare, 0)} of its volume, and their daily transfer count moved {pctChg(walTxChange)}. The drop in headline volume came mostly from exchanges and contracts, not people.</>}>
+        <Panel kicker="Change in average daily volume · after vs before 5 Nov" title="All transfers vs ordinary wallets"
+          table={{ columns: ['Token', 'All · before /day', 'All · after /day', 'All change', 'Wallets · before /day', 'Wallets · after /day', 'Wallets change', 'Wallets $10k+ share after'],
+            rows: ws.map((w) => [w.token, fmtUsd(w.all.base.perDay), fmtUsd(w.all.post.perDay), pctChg(w.allChange),
+              fmtUsd(w.wal.base.perDay), fmtUsd(w.wal.post.perDay), pctChg(w.walChange), fmtPct(bizShare(w.walBands.post))]) }}
+          note="Ordinary wallets: neither sender nor receiver is a contract (bigquery-public-data.crypto_ethereum.contracts) or an address with 1,000+ USDT/USDC transfers in the window. A heuristic: exchange deposit addresses and some wallets with EIP-7702 delegation can still pass.">
+          <div className="mb-5 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-ink-line bg-ink-line">
+            {[['Share of USDT transfers', fmtPct(wUsdt.txShare, 0)], ['Share of USDT volume', fmtPct(wUsdt.volShare, 0)],
+              ['Their volume in $10k+', fmtPct(bizShare(wUsdt.walBands.post), 0)]].map(([k, v]) => (
+              <div key={k} className="bg-ink-2 p-4"><p className="text-[11px] leading-snug text-fg-3">{k}</p><p className="mt-1.5 text-xl font-semibold text-fg-1">{v}</p></div>
+            ))}
+          </div>
+          <div className="mb-4 flex gap-4 text-xs text-fg-2">
+            {walletChart.datasets.map((d) => <span key={d.label} className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-sm" style={{ background: d.backgroundColor }} />{d.label}</span>)}
+          </div>
+          <div className="h-48">
+            <Bar data={walletChart} options={{
+              indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+              plugins: { tooltip: { callbacks: { label: (c) => ` ${c.dataset.label}  ${pctChg(c.parsed.x / 100)}` } } },
+              scales: { x: { min: -60, max: 0, grid: { color: '#262626' }, border: { display: false }, ticks: { callback: (v) => `${v}%` } },
+                y: { grid: { display: false }, border: { display: false }, ticks: { color: '#cccccc' } } },
+            }} />
+          </div>
+        </Panel>
+      </Chapter>
+      )}
+
+      <Chapter id="mix" n="04" kicker="Which dollar"
         headline={<>USDT is {fmtPct(mixPost, 0)} of Ethereum stablecoin volume since 5 Nov.</>}
         body="Daily USDT and USDC volume on Ethereum. Mints and burns are excluded, so issuance doesn't count as activity.">
         <Panel kicker="USD per day" title="Ethereum: USDT vs USDC"
@@ -217,7 +261,7 @@ export default function Monitor({ data }) {
         </Panel>
       </Chapter>
 
-      <Chapter id="peg" n="04" kicker="Price stability"
+      <Chapter id="peg" n="05" kicker="Price stability"
         headline={flagged.length ? <>{flagged.length} day{flagged.length > 1 ? 's' : ''} moved 0.5% or more off $1.</> : <>Neither dollar moved 0.5% off $1.</>}
         body={<>Daily price from CoinGecko. Largest single-day deviation in the window: {fmtPct(maxDev, 2)}. Large dots mark flagged days.</>}>
         <Panel kicker="USD price · daily" title="USDT and USDC against $1.00"
@@ -227,7 +271,7 @@ export default function Monitor({ data }) {
         </Panel>
       </Chapter>
 
-      <Chapter id="concentration" n="05" kicker="Who moves it"
+      <Chapter id="concentration" n="06" kicker="Who moves it"
         headline={<>Ten addresses send {fmtPct(conc('USDT', 'post')?.top10_share, 0)} of Ethereum USDT volume.</>}
         body="Share of each window's volume sent by the 10 largest sending addresses. No labels needed. High concentration often points to exchanges and market makers rather than end users.">
         <Panel kicker="Top-10 sender share · Ethereum">
@@ -252,7 +296,7 @@ export default function Monitor({ data }) {
       <section id="limits" className="scroll-mt-16 bg-paper text-paper-text">
         <div className="mx-auto grid max-w-page gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12">
           <Reveal>
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-paper-muted">06 · Limits</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-paper-muted">07 · Limits</p>
             <h2 className="mt-4 text-[28px] font-semibold leading-[1.1] tracking-display sm:text-[36px]">What this data can't tell you.</h2>
             <p className="mt-4 max-w-md text-[15px] leading-relaxed text-paper-muted">Read these before quoting any number. The full method lists every definition.</p>
           </Reveal>
