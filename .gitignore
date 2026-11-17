@@ -1,0 +1,12 @@
+.env
+registry/labels_private.csv
+node_modules/
+site/node_modules/
+site/dist/
+__pycache__/
+*.pyc
+.DS_Store
+
+# leftovers from the first download, not part of the project
+/africa-stablecoin-monitor/
+*.zip
