@@ -86,3 +86,31 @@ export const fmtUsd = (v, digits = 2) =>
 export const fmtPct = (v, d = 1) => (v == null ? '—' : `${(v * 100).toFixed(d)}%`)
 export const fmtDay = (iso) =>
   iso ? new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }) : '—'
+
+// "Ordinary wallets" vs all transfers for one Ethereum token: average daily volume per window,
+// and the wallets' share of transfers and volume after post_start.
+export function walletStats(data, token) {
+  const wb = data.wallet_bands || []
+  if (!wb.length) return null
+  const agg = (rows, window) => {
+    const rs = rows.filter((r) => r.chain === 'ethereum' && r.token === token && (window === 'post') === isPost(r.day, data.meta))
+    const days = new Set(rs.map((r) => r.day)).size
+    const vol = rs.reduce((a, r) => a + r.volume_usd, 0), n = rs.reduce((a, r) => a + r.transfers, 0)
+    return { days, vol, n, perDay: days ? vol / days : null }
+  }
+  const all = { base: agg(data.bands, 'baseline'), post: agg(data.bands, 'post') }
+  const wal = { base: agg(wb, 'baseline'), post: agg(wb, 'post') }
+  const chg = (w) => (w.base.perDay ? w.post.perDay / w.base.perDay - 1 : null)
+  return {
+    token, all, wal, allChange: chg(all), walChange: chg(wal),
+    txShare: all.post.n ? wal.post.n / all.post.n : null,
+    volShare: all.post.vol ? wal.post.vol / all.post.vol : null,
+    walBands: { base: bandSharesFrom(wb, data, token, 'baseline'), post: bandSharesFrom(wb, data, token, 'post') },
+  }
+}
+
+function bandSharesFrom(rows, data, token, window) {
+  const rs = rows.filter((r) => r.token === token && (window === 'post') === isPost(r.day, data.meta))
+  const total = rs.reduce((a, r) => a + r.volume_usd, 0)
+  return data.meta.bands.map((band) => (total ? rs.filter((r) => r.band === band).reduce((a, r) => a + r.volume_usd, 0) / total : null))
+}

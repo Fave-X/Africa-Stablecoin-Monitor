@@ -49,6 +49,15 @@ def main(sample: bool = False) -> None:
             bands.append({"day": r["day"], "chain": chain, "token": r["token"], "band": r["band"],
                           "transfers": int(float(r["transfers"])), "volume_usd": float(r["volume_usd"])})
 
+    # Optional: "ordinary wallets only" bands (queries/13). Same window as the full bands.
+    last_band_day = max((b["day"] for b in bands), default=None)
+    wallet_bands = [
+        {"day": r["day"], "chain": "ethereum", "token": r["token"], "band": r["band"],
+         "transfers": int(float(r["transfers"])), "volume_usd": float(r["volume_usd"])}
+        for r in (read("eth_wallet_bands.csv") or [])
+        if BASELINE_START.isoformat() <= r["day"] <= (last_band_day or r["day"])
+    ]
+
     fees = []
     for r in read("eth_fees.csv") or missing.append("eth_fees.csv") or []:
         px = prices.get("ETH", {}).get(r["day"])
@@ -94,9 +103,9 @@ def main(sample: bool = False) -> None:
         "missing": missing,
     }
     SITE_DATA.mkdir(parents=True, exist_ok=True)
-    out = {"meta": meta, "bands": bands, "fees": fees, "concentration": concentration, "peg": peg}
+    out = {"meta": meta, "bands": bands, "fees": fees, "concentration": concentration, "peg": peg, "wallet_bands": wallet_bands}
     (SITE_DATA / "monitor.json").write_text(json.dumps(out, separators=(",", ":")), encoding="utf-8")
-    print(f"monitor.json: {len(bands)} band rows, {len(fees)} fee rows, missing={missing or 'none'}")
+    print(f"monitor.json: {len(bands)} band rows, {len(wallet_bands)} wallet rows, {len(fees)} fee rows, missing={missing or 'none'}")
     for w in ("baseline", "post"):
         n = sum(1 for d in days if window_of(d) == w)
         print(f"  {w}: {n} days")

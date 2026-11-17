@@ -63,6 +63,7 @@ These are two different businesses on the same chain:
 
 ## What this can't tell you
 
+- **Two chains so far.** This issue covers Ethereum and Tron. BNB Smart Chain and Solana, the other rails Nigerians use most, come in Issue #1.
 - **The chain has no country field.** These are the rails Nigerian businesses use, not Nigerian volume.
 - **The fiat side is invisible.** Naira payouts, bank transfers, exchange netting and P2P trades never touch the chain.
 - **The wallet filter is a rule of thumb.** Exchange deposit addresses and some smart-account wallets can still pass it.

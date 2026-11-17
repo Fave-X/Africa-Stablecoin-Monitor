@@ -308,6 +308,7 @@ export default function Monitor({ data }) {
                 ['Size is a proxy', 'One person can send $50k; a business can split payments into small ones.'],
                 ['Timing is not cause', 'A few weeks after 5 Nov shows what changed, not why.'],
                 ["No company's own flows", 'Those need labels the company provides.'],
+                ['Two chains so far', 'Ethereum and Tron. BNB Smart Chain and Solana, the other rails Nigerians use most, come in Issue #1.'],
               ].map(([h, b], i) => (
                 <li key={h} className="grid grid-cols-[2.5rem_1fr] gap-2 py-4">
                   <span className="text-sm tabular-nums text-paper-muted">0{i + 1}</span>
