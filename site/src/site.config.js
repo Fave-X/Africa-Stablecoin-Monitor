@@ -3,7 +3,7 @@ export const SITE = {
   name: 'Rails Monitor',
   author: 'FaveDigitals',
   x: 'https://x.com/FaveDigitalsHQ',
-  github: 'https://github.com/Fave-X/africa-stablecoin-monitor',
+  github: 'https://github.com/Fave-X/Africa-Stablecoin-Monitor',
   portfolio: 'https://favedigitals.vercel.app',
   email: '', // e.g. 'favourtabugbo@gmail.com'. Shown as a "Get in touch" link when set
 }

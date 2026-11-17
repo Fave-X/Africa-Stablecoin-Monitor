@@ -27,18 +27,24 @@ const crosshair = {
   },
 }
 
-// Dashed vertical marker at a category label (the 5 Nov CBN effective date).
+// Dashed vertical markers at category labels: the 5 Nov CBN date, plus any flagged outlier days.
+// opts: { label, text } for one marker, or { markers: [{ label, text, color }] } for several.
 const eventMarker = {
   id: 'eventMarker',
   afterDatasetsDraw(chart, _args, opts) {
-    if (!opts || !opts.label) return
-    const idx = chart.data.labels.indexOf(opts.label)
-    if (idx < 0) return
-    const px = chart.scales.x.getPixelForValue(idx), { top, bottom } = chart.chartArea, ctx = chart.ctx
-    ctx.save(); ctx.strokeStyle = '#868f97'; ctx.setLineDash([3, 4]); ctx.lineWidth = 1
-    ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, bottom); ctx.stroke(); ctx.setLineDash([])
-    ctx.fillStyle = '#cccccc'; ctx.font = '500 11px "Inter Variable", Inter, sans-serif'
-    ctx.fillText(opts.text || '', px + 6, top + 11); ctx.restore()
+    const list = opts?.markers || (opts?.label ? [opts] : [])
+    const { top, bottom } = chart.chartArea, ctx = chart.ctx
+    list.forEach((m, i) => {
+      const idx = chart.data.labels.indexOf(m.label)
+      if (idx < 0) return
+      const px = chart.scales.x.getPixelForValue(idx)
+      ctx.save(); ctx.strokeStyle = m.color || '#868f97'; ctx.setLineDash([3, 4]); ctx.lineWidth = 1
+      ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, bottom); ctx.stroke(); ctx.setLineDash([])
+      ctx.fillStyle = m.color || '#cccccc'; ctx.font = '500 11px "Inter Variable", Inter, sans-serif'
+      const w = ctx.measureText(m.text || '').width
+      const x = px + 6 + w > chart.chartArea.right ? px - 6 - w : px + 6
+      ctx.fillText(m.text || '', x, top + 11 + (m.row ?? i % 2) * 14); ctx.restore()
+    })
   },
 }
 Chart.register(crosshair, eventMarker)

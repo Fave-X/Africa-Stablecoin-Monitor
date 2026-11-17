@@ -14,33 +14,6 @@ export function Reveal({ as: Tag = 'div', className = '', delay = 0, children, .
   return <Tag ref={ref} style={{ transitionDelay: `${delay}ms` }} className={`reveal ${inView ? 'is-in' : ''} ${className}`} {...rest}>{children}</Tag>
 }
 
-// Counts a number up once when it appears. Formatting is supplied by the caller.
-export function CountUp({ value, format, duration = 900 }) {
-  const ref = useRef(null)
-  const [shown, setShown] = useState(value)
-  useEffect(() => {
-    if (value == null) return
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduced) { setShown(value); return }
-    setShown(0)
-    let raf
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return
-      io.disconnect()
-      const t0 = performance.now()
-      const step = (now) => {
-        const k = Math.min(1, (now - t0) / duration)
-        setShown(value * (1 - Math.pow(1 - k, 3)))
-        if (k < 1) raf = requestAnimationFrame(step)
-      }
-      raf = requestAnimationFrame(step)
-    })
-    io.observe(ref.current)
-    return () => { io.disconnect(); cancelAnimationFrame(raf) }
-  }, [value, duration])
-  return <span ref={ref} className="tabular-nums">{format(value == null ? null : shown)}</span>
-}
-
 // Pill segmented control (single choice).
 export function Segmented({ options, value, onChange, label }) {
   return (

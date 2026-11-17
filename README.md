@@ -2,7 +2,9 @@
 
 Stablecoin rails used for African payments (Tron USDT, Ethereum USDT/USDC), before and after Nigeria's CBN framework for non-security virtual assets took effect on **5 Nov 2026**. Public data, open method. Built by FaveDigitals (@FaveDigitalsHQ).
 
-- **Method and limits:** [METHOD.md](METHOD.md)
+- **Live site:** https://fave-x.github.io/Africa-Stablecoin-Monitor/
+- **Method, data checks and limits:** [METHOD.md](METHOD.md)
+- **Cadence:** Issue #0 is a fixed snapshot (5 Oct – 15 Nov 2026). Data is refreshed per issue, not automatically.
 - **Site:** `site/` (React + Vite + Chart.js + Tailwind), reads one file: `site/public/data/monitor.json`
 
 ## Folder map
@@ -27,10 +29,10 @@ cd site; npm install; cd ..
 ```
 
 **1. Ethereum (BigQuery console, no install needed)**
-Open console.cloud.google.com/bigquery, run `queries/00_checks.sql` first, then each of `10_`, `11_`, `12_`. For each result: **Save results → CSV (local file)** and save into `data/raw/` with the name written at the top of the query (e.g. `eth_size_bands.csv`). Check the "This query will process…" estimate before every run.
+Open console.cloud.google.com/bigquery, run `queries/00_checks.sql` first, then each of `10_`, `11_`, `13_`, `15_`. For each result: **Save results → CSV (local file)** and save into `data/raw/` with the name written at the top of the query (e.g. `eth_size_bands.csv`). Check the "This query will process…" estimate before every run.
 
 **2. Tron** (one of these)
-- If check D was cheap: run `queries/20_tron_size_bands.sql` → save as `data/raw/tron_size_bands.csv`, set `TRON_MODE=bigquery` in `.env`.
+- Run `queries/20_tron_size_bands.sql` → save as `data/raw/tron_size_bands.csv`, and `queries/21_tron_wallets_daily.sql` → `data/raw/tron_wallets_daily.csv`. Keep `TRON_MODE=bigquery` in `.env`.
 - Otherwise (default): `python pipeline/tron_sample.py --days 2` to test, then `python pipeline/tron_sample.py` for the full window.
 
 The Tron fee file (`tron_fees.csv`) always comes from `tron_sample.py`.
@@ -44,21 +46,21 @@ python pipeline/fetch_prices.py
 **4. Build the site data and look at it**
 
 ```powershell
-python pipeline/build_site_data.py
+python pipeline/build_site_data.py   # prints PASS/FAIL for every data check; stops on any FAIL
 cd site; npm run dev            # open the localhost link it prints
 ```
 
+`npm run build` (and the GitHub Pages deploy) re-checks the data first and refuses to publish if anything fails.
+
 The red **SAMPLE DATA** banner must be gone before you share any link. It appears only when the data came from `make_sample_data.py`.
 
-## Deploy
+## Deploy (GitHub Pages)
 
-**Vercel (sprint default):** New Project → import this repo → **Root Directory: `site`** → Framework: Vite → Deploy. Every push redeploys.
-
-**GitHub Pages (later):** repo Settings → Pages → Source: **GitHub Actions**. `.github/workflows/deploy-pages.yml` builds with the right base path and publishes to `https://fave-x.github.io/africa-stablecoin-monitor/`.
+One time: repo **Settings → Pages → Source: GitHub Actions**. After that, every push to `main` runs `.github/workflows/deploy-pages.yml`, which checks the data, builds with the right base path and publishes to **https://fave-x.github.io/Africa-Stablecoin-Monitor/** (the path is case-sensitive).
 
 ## Refresh
 
-Re-run steps 1–4, commit `data/raw/*.csv` and `site/public/data/monitor.json`, push. The "built" timestamp on the site updates itself.
+Per issue: re-run steps 1–4, commit `data/raw/*.csv` and `site/public/data/monitor.json`, push. If headline numbers change, regenerate `site/public/og.png` (the link-preview image) so it matches.
 
 ## Preview with synthetic data
 
