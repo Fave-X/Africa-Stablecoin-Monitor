@@ -53,7 +53,11 @@ Ethereum got less concentrated as big-ticket flows pulled back. Tron was already
 
 ## 3. One Saturday can rewrite the story
 
-On Saturday 17 October, Ethereum USDT moved **$169.7B**, 9.8 times a normal day, almost all of it in transfers of $100k or more. Ordinary wallets were quiet that day, so this was contract or bot activity, not payments. It's flagged on the monitor and left out of every comparison, along with two smaller spikes (7 Oct and 3 Nov).
+On Saturday 17 October, Ethereum USDT moved **$169.7B**, 9.8 times a normal day, almost all of it in transfers of $100k or more. Ordinary wallets were quiet that day.
+
+**What it was:** flash-loan loops, not payments. Fifteen address pairs, every one of them contracts, carried 87% of the day's $100k+ volume, all between 05:43 and 09:53 UTC. In a typical transaction, a bot contract borrowed 40,000,000 USDT from [Morpho Blue](https://docs.morpho.org/get-started/resources/addresses/) as a flash loan, moved it in and out of the address Etherscan labels "BiFi Finance: USDT Wallet" dozens of times in $1.5M–$2M pieces (76 token transfers in one transaction), repaid the loan in the same transaction, and kept about $0.90. A few hundred transactions like that produce a $170B day without a single dollar changing owners. ([Sample transaction](https://etherscan.io/tx/0x60685d0142d6dde4c8a78c6e063a1f62853bcca113fafaa25ed53cc2f4e70b0e).)
+
+It's flagged on the monitor and left out of every comparison, along with two smaller spikes (7 Oct and 3 Nov), which haven't been investigated yet.
 
 It matters because the method decides the headline:
 
@@ -101,7 +105,7 @@ That's two businesses on one rail:
 
 1. **Price Tron with staking in mind.** Stake or rent energy for payout wallets, and track how many payouts go to first-time addresses.
 2. **Route by ticket size.** Treat small payouts and large treasury moves as separate flows with separate cost and risk rules.
-3. **Watch wallet-level activity, not headline volume.** Headline volume is mostly exchange and market-maker churn; one Saturday of it can swing a monthly average by 30 points.
+3. **Watch wallet-level activity, not headline volume.** Headline volume is mostly exchange, market-maker and bot churn; one Saturday of flash-loan loops swung a monthly average by 30 points.
 
 ## What this can't tell you
 

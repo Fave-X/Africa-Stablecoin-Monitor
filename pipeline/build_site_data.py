@@ -33,6 +33,16 @@ COMPARE_RULE = ("Before/after figures compare average weekdays (Mon–Fri) only,
 
 RAILS = [("ethereum", "USDT"), ("tron", "USDT"), ("ethereum", "USDC")]
 
+# What we found when we investigated a flagged day (queries/14 + Etherscan). Shown on the site.
+FLAG_NOTES = {
+    ("2026-10-17", "ethereum", "USDT"): (
+        "Flash-loan loops, not payments. Between 05:43 and 09:53 UTC a handful of bot contracts borrowed "
+        "USDT from Morpho Blue in $40M flash loans and cycled it in and out of the address Etherscan labels "
+        "'BiFi Finance: USDT Wallet' dozens of times per transaction, repaying in the same transaction. "
+        "15 address pairs, all contracts, carried 87% of the day's $100k+ volume."
+    ),
+}
+
 
 def read(name):
     p = RAW / name
@@ -162,7 +172,7 @@ def main(sample: bool = False) -> None:
             if med and v > OUTLIER_MULTIPLE * med:
                 flagged.append({"day": d, "chain": chain, "token": token,
                                 "volume_usd": round(v, 2), "multiple_of_median": round(v / med, 1),
-                                "note": ""})
+                                "note": FLAG_NOTES.get((d, chain, token), "")})
     excluded = sorted({f["day"] for f in flagged})
 
     def comparable(d):

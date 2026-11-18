@@ -305,10 +305,11 @@ export default function Monitor({ data }) {
 
       <Chapter id="daily" n={nums.daily} kicker="Daily volume"
         headline={biggest
-          ? <>On {fmtDay(biggest.day)}, Ethereum {biggest.token} moved {fmtUsd(biggest.volume_usd)}, {biggest.multiple_of_median}× a normal day. It's flagged and left out.</>
+          ? <>On {fmtDay(biggest.day)}, Ethereum {biggest.token} moved {fmtUsd(biggest.volume_usd)}, {biggest.multiple_of_median}× a normal day. {biggest.note ? 'It was bots looping borrowed money.' : "It's flagged and left out."}</>
           : <>No outlier days in this window.</>}
         body={<>
-          <p>Any day where a rail moves more than 3× its median day is flagged and left out of every before/after figure. {biggest && <>On {fmtDay(biggest.day)} ordinary wallets were quiet, so the spike came from contracts or bots, not payments.</>}</p>
+          <p>Any day where a rail moves more than 3× its median day is flagged and left out of every before/after figure.</p>
+          {biggest?.note && <p><span className="text-fg-2">What {fmtDay(biggest.day)} was:</span> {biggest.note}</p>}
           <p>USDT's share of Ethereum USDT+USDC value: {fmtPct(compare.usdt_share_of_eth_usdt_usdc.baseline, 0)} before 5 Nov, {fmtPct(compare.usdt_share_of_eth_usdt_usdc.post, 0)} after.</p>
         </>}>
         <Panel kicker="USD per day" title="Daily value moved"

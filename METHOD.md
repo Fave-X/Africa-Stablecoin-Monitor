@@ -27,6 +27,8 @@ Before/after figures compare the **average weekday (Mon–Fri)** in each window 
 
 **Outlier rule:** a day is flagged when a rail moves more than **3× its median day** in the window. Flagged days are marked on the daily-volume chart and listed on the page. Current flags: 7 Oct (Ethereum USDT, 3.3×), 17 Oct (Ethereum USDT, 9.8×), 3 Nov (Ethereum USDC, 3.2×).
 
+**17 Oct, investigated** (`queries/14_eth_oct17_forensics.sql` + Etherscan): 15 address pairs, all contracts, carried 87% of the day's $100k+ volume between 05:43 and 09:53 UTC. Bot contracts took $40M USDT flash loans from Morpho Blue, cycled the funds in and out of the address Etherscan labels "BiFi Finance: USDT Wallet" dozens of times per transaction, and repaid in the same transaction. The same dollars were counted thousands of times; no value changed owners. 7 Oct and 3 Nov are flagged by the rule but not yet investigated.
+
 **Sensitivity: change in daily value after 5 Nov under each choice**
 
 | Rail | All days | All days, flags out | Weekdays | **Weekdays, flags out (used)** | Median day |
