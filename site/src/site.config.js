@@ -5,5 +5,5 @@ export const SITE = {
   x: 'https://x.com/FaveDigitalsHQ',
   github: 'https://github.com/Fave-X/Africa-Stablecoin-Monitor',
   portfolio: 'https://favedigitals.vercel.app',
-  email: '', // e.g. 'favourtabugbo@gmail.com'. Shown as a "Get in touch" link when set
+  email: '', // contact address shown as a "Get in touch" link when set
 }

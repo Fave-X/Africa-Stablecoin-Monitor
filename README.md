@@ -14,7 +14,7 @@ queries/     SQL for BigQuery (00_checks first, always)
 pipeline/    Python: prices, Tron sampling, build monitor.json, sample-data generator
 data/raw/    CSVs from BigQuery / scripts (inputs to build_site_data.py)
 registry/    labels.csv: tier-A operator addresses only (public)
-reports/     issue-0, nigeria-receive-side, compliance-trace (Markdown, shown on the site)
+reports/     issue-0 (the memo, shown on the site); drafts live here until finished
 site/        the website
 ```
 

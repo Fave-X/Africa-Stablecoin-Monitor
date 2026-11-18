@@ -2,7 +2,7 @@
 
 **Stablecoin rails before and after 5 November 2026: what moved, what it costs, and what the chain can't see.**
 
-Favour Tabugbo (FaveDigitals) · 17 November 2026
+FaveDigitals · 17 November 2026
 
 **Windows:** 5 Oct – 4 Nov 2026 vs 5 – 15 Nov 2026. Nigeria's CBN framework for virtual-asset service providers took effect on 5 Nov.
 

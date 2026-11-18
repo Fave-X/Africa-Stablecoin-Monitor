@@ -10,3 +10,6 @@ __pycache__/
 # leftovers from the first download, not part of the project
 /africa-stablecoin-monitor/
 *.zip
+
+# work for other companies, kept local, never published
+/_private/

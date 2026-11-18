@@ -26,8 +26,7 @@ export default function Footer({ meta }) {
           </p>
         </div>
         <Col title="Read" links={[
-          { label: 'Monitor', href: '#/' }, { label: 'Issue #0', href: '#/issue-0' },
-          { label: 'Nigeria receive-side', href: '#/nigeria-receive-side' }, { label: 'Compliance trace', href: '#/compliance-trace' },
+          { label: 'Monitor', href: '#/' }, { label: 'Issue #0 memo', href: '#/issue-0' },
         ]} />
         <Col title="Check" links={[
           { label: 'Method & limits', href: '#/method' }, { label: 'Source code', href: SITE.github },

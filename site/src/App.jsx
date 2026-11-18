@@ -4,18 +4,15 @@ import MarkdownPage from './pages/MarkdownPage'
 import Footer from './components/Footer'
 import methodMd from '../../METHOD.md?raw'
 import issue0Md from '../../reports/issue-0/README.md?raw'
-import nigeriaMd from '../../reports/nigeria-receive-side/README.md?raw'
-import traceMd from '../../reports/compliance-trace/README.md?raw'
 import { SITE } from './site.config'
 
 const ROUTES = [
   { path: '/', label: 'Monitor' },
   { path: '/issue-0', label: 'Issue #0' },
-  { path: '/nigeria-receive-side', label: 'Nigeria' },
-  { path: '/compliance-trace', label: 'Compliance' },
   { path: '/method', label: 'Method' },
 ]
-const DOCS = { '/method': methodMd, '/issue-0': issue0Md, '/nigeria-receive-side': nigeriaMd, '/compliance-trace': traceMd }
+// Only finished pages are routed. Drafts (e.g. the Nigeria receive-side brief) stay out until they're done.
+const DOCS = { '/method': methodMd, '/issue-0': issue0Md }
 
 const useRoute = () => {
   const get = () => {
