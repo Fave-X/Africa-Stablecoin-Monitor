@@ -39,7 +39,7 @@ Before/after figures compare the **average weekday (Mon–Fri)** in each window 
 
 The direction is the same under every choice; only the size of the Ethereum drop depends on it. With 7 comparable post weekdays so far, treat every change as an early read.
 
-The 30-day registration deadline for existing operators is 5 Dec 2026. Issue #1 extends the post window past it.
+The CBN's transition rules (Section 54 of the [Regulations](https://www.cbn.gov.ng/Out/2026/CCD/REGULATIONS%20FOR%20THE%20OPERATIONS%20OF%20NON-SECURITY%20VIRTUAL%20ASSETS%20IN%20NIGERIA.pdf)) give existing operators three deadlines: register within 30 days (by 5 Dec 2026), start supervisory reporting within 60 days, and submit a complete licence application within 180 days (by about 4 May 2027). Issue #1 extends the post window past the 5 Dec registration deadline.
 
 ## 3. Rails and tokens
 
